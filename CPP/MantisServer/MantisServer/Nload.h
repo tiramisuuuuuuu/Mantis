@@ -232,18 +232,40 @@ namespace mantisServer{
             HighFive::DataSet datasetNidx = HDFNfile.getDataSet(NidxNameSet);
             HighFive::DataSet datasetNLoad = HDFNfile.getDataSet(NloadNameSet);
             HighFive::DataSet datasetLUNG = HDFNfile.getDataSet(LUNGNameSet);
+
             datasetLU.read(LU);
-            datasetNidx.read(Nidx);
+            try {
+                datasetNidx.read(Nidx);
+            } catch (const HighFive::Exception& err) {
+                // Read into a 2D vector
+                std::vector<std::vector<int>> temp;
+                datasetNidx.read(temp);
+
+                // Flatten the single row into a 1D vector
+                if (!temp.empty()) {
+                    Nidx = temp[0];  // copy the only row
+                }
+            }
             datasetNLoad.read(Ndata);
             std::vector<int> lung;
-            datasetLUNG.read(lung);
+            try {
+                datasetLUNG.read(lung);
+            } catch (const HighFive::Exception& err) {
+                // Read into a 2D vector
+                std::vector<std::vector<int>> temp;
+                datasetLUNG.read(temp);
+
+                // Flatten the single row into a 1D vector
+                if (!temp.empty()) {
+                    lung = temp[0];  // copy the only row
+                }
+            }
             if (lung.size() != 6){
                 std::cout << "The LUNgrid property must have 6 values" << std::endl;
                 return false;
             }
             LUtsgrid.init(lung[0],lung[2],lung[1],xm);
             Nloadtsgrid.init(lung[3],lung[5],lung[4],xm);
-
 
             nRows = LU[0].size();
             nN = Ndata.size();

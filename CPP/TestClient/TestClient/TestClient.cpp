@@ -146,10 +146,10 @@ int main(int argc, char* argv[])
 		}
 	}
 
-    boost::asio::io_service io_service;
+    boost::asio::io_context io_context;
 
-    boost::asio::ip::tcp::socket socket(io_service);
-    socket.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), 1234));
+    boost::asio::ip::tcp::socket socket(io_context);
+    socket.connect(boost::asio::ip::tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 1234));
 		
 	boost::system::error_code error;
 	boost::asio::write(socket, boost::asio::buffer(msg), error);
